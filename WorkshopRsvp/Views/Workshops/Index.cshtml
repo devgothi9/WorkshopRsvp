@@ -1,0 +1,50 @@
+@model IEnumerable<string>
+@{
+    ViewData["Title"] = "Workshops";
+    var count = (int)(ViewData["RegistrationCount"] ?? 0);
+}
+
+<div class="p-4 p-md-5 mb-4 bg-light rounded-3 border">
+    <h1 class="display-6 fw-semibold">Workshop RSVP</h1>
+    <p class="lead mb-4">
+        Reserve your seat at one of our hands-on ASP.NET Core workshops.
+        Fill in a short form, let us know if you need an accommodation, and you're in.
+    </p>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-primary btn-lg" asp-controller="Workshops" asp-action="RsvpForm">RSVP Now</a>
+        <a class="btn btn-outline-secondary btn-lg" asp-controller="Workshops" asp-action="Registrations">
+            View Registrations <span class="badge bg-secondary ms-1">@count</span>
+        </a>
+    </div>
+</div>
+
+<h2 class="h4 mb-3">Available workshops</h2>
+<div class="row g-3">
+    @foreach (var title in Model)
+    {
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h5 card-title">@title</h3>
+                    <p class="card-text text-muted">
+                        @switch (title)
+                        {
+                            case "Routing Basics":
+                                @:Learn how conventional and attribute routing map URLs to controller actions.
+                                break;
+                            case "EF Core Intro":
+                                @:Connect your app to a database with Entity Framework Core and migrations.
+                                break;
+                            case "Razor Essentials":
+                                @:Write clean views with Razor syntax, layouts, partials and Tag Helpers.
+                                break;
+                            default:
+                                @:A hands-on session for ASP.NET Core developers.
+                                break;
+                        }
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,51 @@
+@model Rsvp
+@{
+    ViewData["Title"] = "RSVP Confirmed";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        @* Confirmation message set in the controller with ViewData["Message"] *@
+        <div class="alert alert-success shadow-sm" role="alert">
+            <h1 class="h4 alert-heading mb-0">@ViewData["Message"]</h1>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Your RSVP details</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">@Html.DisplayNameFor(m => m.FullName)</dt>
+                    <dd class="col-sm-7">@Model.FullName</dd>
+
+                    <dt class="col-sm-5">@Html.DisplayNameFor(m => m.Email)</dt>
+                    <dd class="col-sm-7">@Model.Email</dd>
+
+                    <dt class="col-sm-5">@Html.DisplayNameFor(m => m.WorkshopTitle)</dt>
+                    <dd class="col-sm-7">@Model.WorkshopTitle</dd>
+
+                    <dt class="col-sm-5">Needs Accommodation</dt>
+                    <dd class="col-sm-7">
+                        @if (Model.NeedsAccommodation)
+                        {
+                            <span class="badge bg-warning text-dark">Yes</span>
+                            <div class="small text-muted mt-1">Our team will contact you to arrange it.</div>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">No</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-5">@Html.DisplayNameFor(m => m.RegisteredOn)</dt>
+                    <dd class="col-sm-7">@Model.RegisteredOn.ToString("MMM d, yyyy h:mm tt")</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <a class="btn btn-primary" asp-controller="Workshops" asp-action="Registrations">See All Registrations</a>
+            <a class="btn btn-outline-primary" asp-controller="Workshops" asp-action="RsvpForm">Register Someone Else</a>
+            <a class="btn btn-outline-secondary" asp-controller="Workshops" asp-action="Index">Back to Workshops</a>
+        </div>
+    </div>
+</div>

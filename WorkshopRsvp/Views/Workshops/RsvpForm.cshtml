@@ -1,0 +1,58 @@
+@model Rsvp
+@{
+    ViewData["Title"] = "RSVP Form";
+    var workshops = ViewData["Workshops"] as string[] ?? Array.Empty<string>();
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <h1 class="h3 mb-3">Workshop RSVP</h1>
+        <p class="text-muted">Fill in your details below to reserve a seat.</p>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form asp-controller="Workshops" asp-action="Confirm" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" placeholder="e.g. Jane Doe" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" placeholder="you@example.com" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="WorkshopTitle" class="form-label"></label>
+                        <select asp-for="WorkshopTitle" class="form-select">
+                            <option value="">-- Select a workshop --</option>
+                            @foreach (var title in workshops)
+                            {
+                                <option value="@title">@title</option>
+                            }
+                        </select>
+                        <span asp-validation-for="WorkshopTitle" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input asp-for="NeedsAccommodation" class="form-check-input" />
+                        <label asp-for="NeedsAccommodation" class="form-check-label"></label>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Submit RSVP</button>
+                        <a class="btn btn-outline-secondary" asp-controller="Workshops" asp-action="Index">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
