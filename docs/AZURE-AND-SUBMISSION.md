@@ -1,6 +1,16 @@
 ﻿# Azure and Brightspace submission for the SQLite version
 
-No deployment, push, paid-resource creation, or credential change has been performed. The project remains `net10.0`. Azure App Service must have a compatible .NET 10 runtime, or a separately prepared self-contained publish for its actual architecture. The self-contained variant has not been tested here.
+The implementation is pushed to GitHub on `lab4-ef`. Deployment to the existing App Service was authorized, but Azure authentication currently blocks upload. No deployment, paid-resource creation, or credential change has been performed. The project remains `net10.0`. Azure App Service must have a compatible .NET 10 runtime, or a separately prepared self-contained publish for its actual architecture. The self-contained variant has not been tested here.
+
+## Current Azure deployment status
+
+Existing App Service: `WorkshopRsvp20261011154731`, resource group `Lab3ResourceGroup`.
+
+Existing URL: `https://workshoprsvp20261011154731-h0b7d4f5gnf7ebfc.canadacentral-01.azurewebsites.net`.
+
+The public site returns HTTP 403 with "This web app is stopped." The saved local publish profile has no deployment credentials. The official Azure Identity SDK obtained an existing Visual Studio sign-in, but Azure rejected its tenant (`InvalidAuthenticationTokenTenant`); authentication to the subscription's expected tenant also failed. The user must sign into Visual Studio with the account that owns this Azure app before deployment can continue. No tokens or passwords were printed or saved by the deployment helper.
+
+The upload ZIP is prepared at `artifacts/lab4-azure-5b074d0.zip`. Its application files, read-only Production configuration, database schema, seed rows and migration history were checked before any upload. The site must be inspected after sign-in to determine whether it is stopped manually, quota-limited or affected by subscription status; the HTTP 403 alone does not establish the cause.
 
 ## Prepared read-only package
 
@@ -58,10 +68,10 @@ Restart App Service and check the same three rows remain. Cloud logs should not 
 2. **Database data screenshot.** The PDF specifies SQL Server Object Explorer -> View Data, but allows SQLite; the reference uses SQLite/SQL Server Compact Toolbox in Visual Studio. Your requested VS Code SQLite view has equivalent table data, but acceptance of that tool is an instructor decision. See [viewer instructions](SQLITE-IN-VSCODE.md). Do not claim the literal PDF screenshot requirement is complete.
 3. **GitHub repository link** containing the `lab4-ef` implementation. Existing remote: `https://github.com/devgothi9/WorkshopRsvp.git`. The local database is generated/ignored; source, migrations and SeedData reproduce it.
 
-No changes have been pushed. Once the local implementation is committed and you approve pushing:
+The implementation commit `5b074d0` was pushed and independently verified on `origin/lab4-ef`. For subsequent authorized updates:
 
 ```powershell
 git push -u origin lab4-ef
 ```
 
-After that push, the submission branch link is `https://github.com/devgothi9/WorkshopRsvp/tree/lab4-ef`. Confirm that the new SQLite migration, SeedData and setup instructions are visible before submitting.
+Submission branch link: `https://github.com/devgothi9/WorkshopRsvp/tree/lab4-ef`. The new SQLite migration, SeedData and setup instructions are included. Azure deployment and the screenshots remain outstanding.

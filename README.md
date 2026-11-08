@@ -65,4 +65,6 @@ The Python check uses only the standard library and opens the database read-only
 
 [Azure preparation and Brightspace checklist](docs/AZURE-AND-SUBMISSION.md).
 
-The local `.db`, reference inspection files, tools, publish output, and publish profiles are ignored by Git. The database is recreated from migrations plus SeedData. The previous SQL Server implementation remains in commit `79dfd5c`; its LocalDB database has not been dropped or modified by the SQLite conversion. Nothing has been deployed or pushed.
+The local `.db`, reference inspection files, tools, publish output, and publish profiles are ignored by Git. The database is recreated from migrations plus SeedData. The previous SQL Server implementation remains in commit `79dfd5c`; its LocalDB database has not been dropped or modified by the SQLite conversion.
+
+The implementation has been pushed to [GitHub, branch lab4-ef](https://github.com/devgothi9/WorkshopRsvp/tree/lab4-ef). Azure deployment was authorized, but is awaiting a valid sign-in for the existing App Service's Azure tenant. The existing website currently reports HTTP 403, "This web app is stopped." A tested ZIP is prepared locally at `artifacts/lab4-azure-5b074d0.zip`; it has not been uploaded.

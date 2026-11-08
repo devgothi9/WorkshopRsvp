@@ -33,7 +33,7 @@ The reference is a .NET 8 project using SQLite and a five-column Rsvps table. Th
 | Azure deployment and deployed Registrations verification | Incomplete; requires approval and an intended App Service target. No upload/deployment performed. |
 | Azure Registrations screenshot | Incomplete; the new code has not been deployed. |
 | PDF SQL Server Object Explorer -> View Data screenshot | Incomplete; PDF allows SQLite but names a SQL Server tool. Reference instead uses a SQLite toolbox. Instructor acceptance of an equivalent SQLite screenshot remains unresolved. |
-| GitHub / Brightspace links | Existing remote identified and local implementation prepared on lab4-ef. Push still requires approval; Azure link remains unavailable. |
+| GitHub / Brightspace links | Implementation pushed to origin/lab4-ef with approval; remote commit verified. Azure site is currently stopped and the new code has not been deployed. |
 
 ## Schema and preserved email behavior
 
@@ -100,4 +100,8 @@ The old SQL Server migration files were replaced because migrations are provider
 
 No unresolved compilation, migration, dependency-audit, database-integrity or tested HTTP errors remain. Local HTTP-only testing logs the expected HTTPS-port warning; real Azure HTTPS still requires verification. The seed initializer is intended for a single-instance lab startup; concurrent initialization was not tested.
 
-A VS Code database editor tab was opened and the extension installed, but the final visual grid remains unverified. Follow [SQLite viewing instructions](SQLITE-IN-VSCODE.md). Actual Azure deployment/verification, Azure screenshot, acceptable database screenshot, GitHub push and Brightspace submission remain pending. See [Azure and submission instructions](AZURE-AND-SUBMISSION.md). No credentials or Azure resources were changed.
+A VS Code database editor tab was opened and the extension installed, but the final visual grid remains unverified. Follow [SQLite viewing instructions](SQLITE-IN-VSCODE.md). Actual Azure deployment/verification, Azure screenshot, acceptable database screenshot and Brightspace submission remain pending. See [Azure and submission instructions](AZURE-AND-SUBMISSION.md). No credentials or Azure resources were changed.
+
+## Authorized publishing attempt
+
+On November 8, 2026, implementation commit `5b074d0` was pushed to the existing GitHub repository's `lab4-ef` branch; `git ls-remote` confirmed the same commit. Deployment to the existing App Service was also authorized. Its public endpoint returned HTTP 403 with "This web app is stopped." The local publish profile identifies the correct app but contains no deployment credentials. Existing Visual Studio sign-in was rejected by Azure with `InvalidAuthenticationTokenTenant`; authentication to the subscription's expected tenant failed too. Deployment requires the user to sign into Visual Studio with the correct Azure account. No upload or Azure mutation has been performed. A validated ZIP package is available at `artifacts/lab4-azure-5b074d0.zip`.
