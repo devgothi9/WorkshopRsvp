@@ -7,6 +7,8 @@ namespace WorkshopRsvp.Models
     /// </summary>
     public class Rsvp
     {
+        public int Id { get; set; }
+
         [Required(ErrorMessage = "Please enter your full name.")]
         [StringLength(80, ErrorMessage = "Name can be at most 80 characters.")]
         [Display(Name = "Full Name")]

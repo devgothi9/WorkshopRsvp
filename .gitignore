@@ -19,3 +19,15 @@
 # OS files
 .DS_Store
 Thumbs.db
+
+# Local tooling, test evidence, database files and deployment output
+.tools/
+artifacts/
+*.mdf
+*.ldf
+*.db
+*.db-shm
+*.db-wal
+**/Properties/PublishProfiles/
+.env
+.env.*

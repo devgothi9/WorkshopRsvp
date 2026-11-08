@@ -1,10 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WorkshopRsvp.Data;
 using WorkshopRsvp.Models;
 
 namespace WorkshopRsvp.Controllers
 {
     public class WorkshopsController : Controller
     {
+        private readonly ApplicationDbContext _context;
+
+        public WorkshopsController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         // Workshops people can choose from (used by the form's drop-down).
         public static readonly string[] WorkshopTitles =
         {
@@ -13,22 +22,10 @@ namespace WorkshopRsvp.Controllers
             "Razor Essentials"
         };
 
-        // In-memory list of registrations, stored statically in the controller.
-        // It starts with a few hardcoded RSVPs, and new ones are added by Confirm (POST).
-        // Note: data resets whenever the app restarts (no database in this lab).
-        private static readonly List<Rsvp> _registrations = new()
-        {
-            new Rsvp { FullName = "Alice Martin", Email = "alice@example.com", WorkshopTitle = "Routing Basics", NeedsAccommodation = false, RegisteredOn = new DateTime(2026, 10, 1, 9, 30, 0) },
-            new Rsvp { FullName = "Bilal Khan", Email = "bilal@example.com", WorkshopTitle = "EF Core Intro", NeedsAccommodation = true, RegisteredOn = new DateTime(2026, 10, 2, 14, 15, 0) },
-            new Rsvp { FullName = "Chloe Tremblay", Email = "chloe@example.com", WorkshopTitle = "Razor Essentials", NeedsAccommodation = false, RegisteredOn = new DateTime(2026, 10, 3, 11, 0, 0) }
-        };
-
-        private static readonly object _lock = new();
-
         // GET: /Workshops  (landing page)
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            ViewData["RegistrationCount"] = _registrations.Count;
+            ViewData["RegistrationCount"] = await _context.Rsvps.CountAsync();
             return View(WorkshopTitles);
         }
 
@@ -53,24 +50,21 @@ namespace WorkshopRsvp.Controllers
             }
 
             model.RegisteredOn = DateTime.Now;
-            lock (_lock)
-            {
-                _registrations.Add(model);
-            }
+            // Lab 4 keeps form confirmation read-only; the list shows seeded data.
 
             ViewData["Message"] = $"Thanks for registering, {model.FullName}!";
             return View(model);
         }
 
         // GET: /Workshops/Registrations
-        public IActionResult Registrations()
+        public async Task<IActionResult> Registrations()
         {
-            List<Rsvp> snapshot;
-            lock (_lock)
-            {
-                snapshot = _registrations.OrderBy(r => r.RegisteredOn).ToList();
-            }
-            return View(snapshot);
+            var registrations = await _context.Rsvps
+                .AsNoTracking()
+                .OrderBy(r => r.RegisteredOn)
+                .ThenBy(r => r.Id)
+                .ToListAsync();
+            return View(registrations);
         }
     }
 }
