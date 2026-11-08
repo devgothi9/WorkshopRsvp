@@ -23,6 +23,7 @@ Thumbs.db
 # Local tooling, test evidence, database files and deployment output
 .tools/
 artifacts/
+debug.log
 *.mdf
 *.ldf
 *.db

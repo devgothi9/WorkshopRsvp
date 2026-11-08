@@ -1,12 +1,8 @@
-﻿# Workshop RSVP - Lab 4 (building on Lab 3)
+﻿# Workshop RSVP - Lab 4 with SQLite
 
-The original ASP.NET Core MVC application now reads registrations from SQL Server using Entity Framework Core. The existing `net10.0` target, workshop choices, Razor views, form validation, and confirmation flow are preserved. EF Core packages and the repository-local CLI tool are pinned to 8.0.22; CodeGeneration.Design is 8.0.6, satisfying the Lab 4 PDF.
+This is the original Lab 3 ASP.NET Core MVC project, extended in place on branch `lab4-ef`. The existing .NET 10 target, workshop descriptions, navigation, form validation, accommodation checkbox, and confirmation flow are preserved. Registrations now come from SQLite through EF Core.
 
-## Local setup
-
-Requirements: .NET 10 SDK (the original project target), Windows SQL Server LocalDB, and NuGet access. Visual Studio SQL Server Object Explorer is used for the assignment's database screenshot.
-
-From the repository root:
+## Run locally
 
 ```powershell
 dotnet restore WorkshopRsvp.sln
@@ -17,53 +13,56 @@ dotnet build WorkshopRsvp.sln --no-restore
 dotnet run --project WorkshopRsvp --launch-profile http
 ```
 
-Open `http://localhost:5080/Workshops/Registrations`. Development startup applies existing migrations and seeds the empty table with Alice Martin, Bilal Khan, and Chloe Tremblay. Restarts do not duplicate the seed records. Database: `WorkshopRsvpLab4` on `(localdb)\MSSQLLocalDB`, table `dbo.Rsvps`.
+Open `http://localhost:5080/Workshops/Registrations`. The database is **WorkshopRsvp/WorkshopRsvp.db**. Startup applies migrations and `SeedData.InitializeAsync` inserts Alice Martin, Bilal Khan, and Chloe Tremblay only when the table is empty. Restarting does not duplicate these records.
 
-## Pages and behavior
+EF Core, SqlServer, Sqlite, Tools, Design, and local dotnet-ef are 8.0.22; CodeGeneration.Design is 8.0.6. These meet the PDF's package limits. Both providers are installed as requested by the PDF; **UseSqlite** selects SQLite. Compatible dependency patches keep the package audit clean.
 
-| URL | Behavior |
-| --- | --- |
-| `/` | Original Home page |
-| `/Home/Privacy` | Original Privacy page |
-| `/Workshops` | Existing workshop descriptions and database registration count |
-| `/Workshops/RsvpForm` | Existing form with validation and accommodation checkbox |
-| `/Workshops/Confirm` (POST) | Validates and displays the submitted model and confirmation message |
-| `/Workshops/Registrations` | Strongly typed view showing asynchronously loaded database records |
+## Schema and Lab 3 behavior
 
-As explicitly allowed by Lab 4, form submissions are not saved. The Registrations page displays the seeded database records. There is no static in-memory registration list and no UI insertion, update, or delete action.
+`Rsvps` has exactly these columns, matching the reference structure:
 
-## Database implementation
+| Column | SQLite type | Constraint |
+| --- | --- | --- |
+| Id | INTEGER | Primary key, autoincrement, not null |
+| FullName | TEXT | Not null |
+| NeedsAccommodation | INTEGER | Not null; 0 or 1 |
+| WorkshopTitle | TEXT | Not null |
+| RegistrationDate | TEXT | Not null; EF Core DateTime value |
 
-- `Models/Rsvp.cs`: existing model plus an integer primary key.
-- `Data/ApplicationDbContext.cs`: options constructor and `DbSet<Rsvp> Rsvps`.
-- `Data/DbInitializer.cs`: static asynchronous seed method, invoked from Program.cs.
-- `Data/Migrations/`: CLI-generated SQL Server migration and model snapshot.
-- `Program.cs`: SQL Server context registration, local migration startup, seed initialization, and production connection guard.
-- `Controllers/WorkshopsController.cs`: injected context, `CountAsync`, and read-only `AsNoTracking().ToListAsync()` queries.
+Email remains on the Lab 3 form and confirmation, with its original required/email validation. It is marked `[NotMapped]`, so it is not stored or shown as a blank database-list column. `RegisteredOn` was renamed to `RegistrationDate` in the model, controller and views. The original name-length validation is retained.
 
-Both SQL Server and SQLite packages are included because the PDF asks for both. SQL Server is selected to meet the SQL Server Object Explorer screenshot requirement and to support Azure SQL deployment. Compatible dependency patches remove the vulnerabilities initially reported by the required older tooling packages.
+Home, Privacy, Workshops, RSVP Form and confirmation are preserved. As specified for Lab 4, submitting a form **does not insert a registration**; All Registrations displays the seeded database records. There is no static registration list.
 
-## Verification
+## Open the database in VS Code
+
+SQLite Viewer (`qwtel.sqlite-viewer`) has been installed, and the database file was opened in the project window. In the Explorer, open **WorkshopRsvp -> WorkshopRsvp.db**, then select **Rsvps** in the viewer's table list. If VS Code shows binary-file text instead, right-click the tab and choose **Reopen Editor With... -> SQLite Viewer**. Select `__EFMigrationsHistory` to inspect the applied migration.
+
+See [the viewer instructions](docs/SQLITE-IN-VSCODE.md), including the distinction between VS Code and the reference's Visual Studio screenshot.
+
+## Verify
 
 With the app running:
 
 ```powershell
 ./scripts/Test-Lab4.ps1
-sqlcmd -S '(localdb)\MSSQLLocalDB' -d WorkshopRsvpLab4 -E -C -i scripts/Verify-Database.sql -W -w 240
+python scripts/verify_database.py
+dotnet ef migrations list --project WorkshopRsvp --no-build
 dotnet ef migrations has-pending-model-changes --project WorkshopRsvp --no-build
 dotnet list WorkshopRsvp package --vulnerable --include-transitive
 ```
 
-If script execution is disabled, run the reviewed test script without changing system policy:
+The Python check uses only the standard library and opens the database read-only. Use your installed Python interpreter if `python` is unavailable. If PowerShell blocks script files, run the reviewed smoke checks without changing system policy:
 
 ```powershell
 & ([scriptblock]::Create((Get-Content scripts/Test-Lab4.ps1 -Raw)))
 ```
 
-The smoke checks expect the lab's three sample records. [The verification report](docs/LAB4-REPORT.md) records actual builds, tests, database contents, migration state, modified files, and remaining work.
+[scripts/Verify-Database.sql](scripts/Verify-Database.sql) contains SQLite queries for a query-capable database tool. The generated [schema script](scripts/Deploy-Lab4.sql) is for a **fresh** SQLite database, not an idempotent SQL Server script. Use `dotnet ef database update` for repeatable updates.
 
-## Azure and submission
+## Deployment and submission
 
-[Azure configuration, deployment, screenshot, and GitHub instructions](docs/AZURE-AND-SUBMISSION.md) explain the remaining approval-dependent steps. Use Azure SQL and override `DefaultConnection` in App Service; LocalDB is only for this computer. The default Production behavior expects an already migrated database and then seeds it if empty.
+[Full verification report and requirement checklist](docs/LAB4-REPORT.md).
 
-No deployment, GitHub push, paid resource creation, or credential changes have been performed. Local build output, publish profiles, tools, and database files are ignored by Git. Work is on branch `lab4-ef`.
+[Azure preparation and Brightspace checklist](docs/AZURE-AND-SUBMISSION.md).
+
+The local `.db`, reference inspection files, tools, publish output, and publish profiles are ignored by Git. The database is recreated from migrations plus SeedData. The previous SQL Server implementation remains in commit `79dfd5c`; its LocalDB database has not been dropped or modified by the SQLite conversion. Nothing has been deployed or pushed.

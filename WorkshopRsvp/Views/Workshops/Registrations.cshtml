@@ -24,10 +24,9 @@ else
                 <tr>
                     <th>#</th>
                     <th>@Html.DisplayNameFor(m => m.FullName)</th>
-                    <th>@Html.DisplayNameFor(m => m.Email)</th>
                     <th>@Html.DisplayNameFor(m => m.WorkshopTitle)</th>
                     <th>Accommodation</th>
-                    <th>@Html.DisplayNameFor(m => m.RegisteredOn)</th>
+                    <th>@Html.DisplayNameFor(m => m.RegistrationDate)</th>
                 </tr>
             </thead>
             <tbody>
@@ -36,7 +35,6 @@ else
                     <tr>
                         <td>@(counter++)</td>
                         <td>@r.FullName</td>
-                        <td>@r.Email</td>
                         <td>@r.WorkshopTitle</td>
                         <td>
                             @if (r.NeedsAccommodation)
@@ -48,7 +46,7 @@ else
                                 <span class="badge bg-secondary">No</span>
                             }
                         </td>
-                        <td>@r.RegisteredOn.ToString("MMM d, yyyy h:mm tt")</td>
+                        <td>@r.RegistrationDate.ToString("MMM d, yyyy h:mm tt")</td>
                     </tr>
                 }
             </tbody>

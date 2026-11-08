@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WorkshopRsvp.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialSqlite : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,13 +15,12 @@ namespace WorkshopRsvp.Data.Migrations
                 name: "Rsvps",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FullName = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    WorkshopTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NeedsAccommodation = table.Column<bool>(type: "bit", nullable: false),
-                    RegisteredOn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FullName = table.Column<string>(type: "TEXT", maxLength: 80, nullable: false),
+                    NeedsAccommodation = table.Column<bool>(type: "INTEGER", nullable: false),
+                    WorkshopTitle = table.Column<string>(type: "TEXT", nullable: false),
+                    RegistrationDate = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -1,97 +1,103 @@
-# Lab 4 final verification report
+﻿# Lab 4 verification report - SQLite version
 
-Verified locally on November 7, 2026 (America/Toronto). Work is inside the original WorkshopRsvp solution on branch `lab4-ef`.
+Verified November 8, 2026 (America/Toronto) inside the original WorkshopRsvp solution, branch `lab4-ef`.
 
-## Requirements
+## Inspection and reference comparison
 
-| Lab requirement | Status and evidence |
+Both pages of the Lab 4 PDF were previously read, rendered and inspected. The current source was inspected again before this change. The reference ZIP's model, context, seed initializer, controller, Program.cs, project file, settings, migration and snapshot were reviewed without executing its application. Only the database and database screenshot were extracted to ignored `artifacts/reference` for inspection. The reference's Git metadata, publish credentials and personal records were not copied into this project's source or database.
+
+The reference is a .NET 8 project using SQLite and a five-column Rsvps table. This project keeps its original .NET 10 target and existing MVC implementation. A direct comparison of `PRAGMA table_info(Rsvps)` in both databases passed: column order, names, types, nullability and primary-key metadata match exactly. The reference screenshot shows Visual Studio's SQLite/SQL Server Compact Toolbox, not VS Code or SQL Server Object Explorer.
+
+## Requirement checklist
+
+| Requirement | Status / evidence |
 | --- | --- |
-| Read the entire PDF | Complete: both pages of Downloads/Lab 4.pdf were extracted, rendered, and inspected, including deliverables, steps, and grading table. |
-| Inspect existing Lab 3 | Complete: model, both controllers, all Razor views, Program.cs, settings, project, assets, and publish metadata inspected. No AGENTS.md found in the project or immediate parent. |
-| Determine .NET/dependencies | Complete: existing target net10.0 retained; installed SDKs 8.0.425 and 10.0.300; original project had no package references. |
-| Create lab4-ef | Complete. Original master branch preserved. |
-| Required packages | Complete: EF Core, SqlServer, Sqlite, Tools, and additional CLI Design package 8.0.22; CodeGeneration.Design 8.0.6. All comply with the PDF's limits. |
-| ApplicationDbContext | Complete: DbContextOptions constructor and DbSet<Rsvp> Rsvps. |
-| Existing Rsvp model | Preserved; added int Id for EF's primary key. Existing validation and display fields retained. |
-| Connection string | Complete locally: DefaultConnection targets WorkshopRsvpLab4 on LocalDB, using Windows authentication and no stored password. Azure override documented. |
-| Context registered | Complete: AddDbContext and UseSqlServer, with transient-failure retries. |
-| Static seed method called from Program.cs | Complete: DbInitializer.InitializeAsync inserts three records only when the table is empty. |
-| Migration created/applied | Complete locally: 20261108004420_InitialCreate creates dbo.Rsvps and is recorded in __EFMigrationsHistory. |
-| Remove static registration list | Complete: removed registration list and lock; workshop title options remain. |
-| Async database reads | Complete: Registrations uses AsNoTracking, deterministic ordering, and ToListAsync; landing count uses CountAsync. |
-| Strongly typed Registrations view | Complete: existing IEnumerable<Rsvp> view already met the requirement and was retained. Three rows verified through HTTP. |
-| Other Lab 3 behavior | Home, Privacy, workshop landing, form, validation, confirmation, accommodation details, links, and assets preserved. As allowed by Lab 4, submissions only show confirmation and do not persist. |
-| Restore/build/test | Complete locally; results below. |
-| Azure deployment preparation | Complete: Release output, idempotent SQL script, production connection guard, and deployment/configuration guide prepared. |
-| Deploy to Azure and verify deployed page | Pending explicit deployment approval and Azure SQL/App Service configuration. No deployment or resource/credential changes performed. |
-| Required screenshots | Pending: Azure Registrations browser screenshot and SQL Server Object Explorer -> View Data screenshot. Exact capture instructions in deployment guide. |
-| GitHub submission | Local implementation committed on lab4-ef with submission documentation; push requires approval. |
+| Work directly in existing Lab 3 project | Complete; same solution, controllers, views and model reused. |
+| Branch lab4-ef | Complete; original master preserved. |
+| PDF-compatible packages | Complete; EF Core, SqlServer, Sqlite, Tools, Design and local dotnet-ef 8.0.22; CodeGeneration.Design 8.0.6. |
+| ApplicationDbContext | Complete; existing options constructor and DbSet<Rsvp> retained. |
+| SQLite connection in appsettings.json | Complete; Data Source=WorkshopRsvp.db;Pooling=False. Relative filenames resolve against the project's content root. |
+| Register context in Program.cs | Complete; UseSqlite replaces UseSqlServer. |
+| SeedData static method invoked at startup | Complete; SeedData.InitializeAsync checks for an empty table before inserting. |
+| Own WorkshopRsvp.db | Complete; generated locally by EF migrations, then seeded by startup; 20,480-byte file at WorkshopRsvp/WorkshopRsvp.db. |
+| Required five-column Rsvps schema | Complete; Id, FullName, NeedsAccommodation, WorkshopTitle, RegistrationDate. Types and constraints verified directly. |
+| Three original sample records | Complete; Alice Martin, Bilal Khan, Chloe Tremblay retained from the user's original project. None of the reference's people copied. |
+| EF migrations created and applied | Complete; 20261108165306_InitialSqlite, product version 8.0.22; no pending model changes. |
+| Remove static registration list | Complete; no static list or registration lock in the controller. |
+| Async EF registrations query | Complete; AsNoTracking, ordering by RegistrationDate/Id, ToListAsync; landing count uses CountAsync. |
+| Strongly typed registrations view | Complete; IEnumerable<Rsvp> renders the three database rows. |
+| Preserve Lab 3 form and confirmation | Complete; workshop choices, email validation, name validation, accommodation details, antiforgery protection, and confirmation preserved. |
+| No database writes from RSVP UI | Complete; valid submissions show confirmation only and do not change database rows, as requested for Lab 4. |
+| VS Code table viewer | SQLite Viewer installed and the exact database file opened by command. Final table-grid visual inspection remains unverified because app access approval timed out. Instructions provided. |
+| Deployment preparation | Complete locally; published app, fresh schema script, reproducible read-only SQLite deployment folder and configuration guide prepared and tested. |
+| Azure deployment and deployed Registrations verification | Incomplete; requires approval and an intended App Service target. No upload/deployment performed. |
+| Azure Registrations screenshot | Incomplete; the new code has not been deployed. |
+| PDF SQL Server Object Explorer -> View Data screenshot | Incomplete; PDF allows SQLite but names a SQL Server tool. Reference instead uses a SQLite toolbox. Instructor acceptance of an equivalent SQLite screenshot remains unresolved. |
+| GitHub / Brightspace links | Existing remote identified and local implementation prepared on lab4-ef. Push still requires approval; Azure link remains unavailable. |
 
-## Files created or modified
+## Schema and preserved email behavior
 
-Created:
+The reference schema has exactly five columns. To preserve the original Lab 3 form, `Rsvp.Email` remains required and email-validated but is `[NotMapped]`. It appears on the form and confirmation, not in SQLite or the registrations table. `RegisteredOn` was renamed to `RegistrationDate` throughout the model, controller, and date displays. This is an intentional adaptation to match the requested structure, not a loss of form validation.
 
-- `WorkshopRsvp/Data/ApplicationDbContext.cs`
-- `WorkshopRsvp/Data/DbInitializer.cs`
-- `WorkshopRsvp/Data/Migrations/20261108004420_InitialCreate.cs`
-- `WorkshopRsvp/Data/Migrations/20261108004420_InitialCreate.Designer.cs`
-- `WorkshopRsvp/Data/Migrations/ApplicationDbContextModelSnapshot.cs`
-- `dotnet-tools.json` (repository-local EF CLI tool)
-- `scripts/Test-Lab4.ps1` (HTTP regression/smoke checks)
-- `scripts/Verify-Database.sql` (database evidence query)
-- `scripts/Deploy-Lab4.sql` (generated, idempotent SQL Server/Azure SQL schema script)
-- `docs/AZURE-AND-SUBMISSION.md`
-- `docs/LAB4-REPORT.md`
+| Id | FullName | NeedsAccommodation | WorkshopTitle | RegistrationDate |
+| --- | --- | --- | --- | --- |
+| 1 | Alice Martin | 0 | Routing Basics | 2026-10-01 09:30:00 |
+| 2 | Bilal Khan | 1 | EF Core Intro | 2026-10-02 14:15:00 |
+| 3 | Chloe Tremblay | 0 | Razor Essentials | 2026-10-03 11:00:00 |
+
+## Actual test results
+
+| Command / check actually run | Result |
+| --- | --- |
+| dotnet restore WorkshopRsvp.sln | Passed. |
+| dotnet tool restore | Passed. |
+| dotnet build WorkshopRsvp.sln --no-restore | Passed: zero warnings, zero errors. |
+| dotnet build WorkshopRsvp.sln -c Release --no-restore | Passed: zero warnings, zero errors. |
+| dotnet publish ... -c Release --no-restore -o artifacts/publish-sqlite | Passed. Development database excluded from default publish output. |
+| dotnet ef migrations add InitialSqlite | Passed; SQLite migration generated by CLI. |
+| dotnet ef database update | Passed; SQLite database, Rsvps and migration history created. |
+| dotnet ef migrations list / has-pending-model-changes | InitialSqlite applied; no pending model changes. |
+| dotnet list ... package --vulnerable --include-transitive | No vulnerable packages reported by the configured sources. |
+| Development app, full HTTP suite | All 19 checks passed. |
+| Restarted development app, same DB | All 19 checks passed again; exactly three records remained. |
+| Published Production app, fresh separate SQLite DB | Automatically migrated/seeded; all 19 HTTP checks and read-only database checks passed. |
+| Prepared read-only deployment folder in Production | All 19 HTTP checks passed, including form confirmation without DB writes. Its database integrity/schema/records check passed. |
+| Direct SQLite verification | PRAGMA integrity_check = ok; exact five-column schema, original records and migration history verified. |
+| Comparison with reference DB metadata | Exact PRAGMA table_info match; only metadata compared, not personal records copied. |
+| Generated SQLite script against a fresh in-memory DB | Passed; expected five-column table created. |
+| Native app visual check | Blocked by app-access approval timeout; no browser/grid visual pass claimed. |
+| Real Azure hosting / Azure URL | Not run; not deployed. |
+
+The 19 HTTP checks cover five pages, three static assets, each seeded name, row count, Yes/No accommodation values, landing count, antiforgery token, invalid-form server validation, valid confirmation and email/accommodation details, unchanged registration rows after submission, and HTTP 400 without an antiforgery token. They do not prove client-side JavaScript behavior or visual layout.
+
+## Files created / modified in the SQLite conversion
+
+Created/renamed:
+
+- `WorkshopRsvp/Data/SeedData.cs` (replaces DbInitializer.cs).
+- `WorkshopRsvp/Data/Migrations/20261108165306_InitialSqlite.cs` and its Designer.cs.
+- `scripts/verify_database.py` (standard-library, read-only DB integration check).
+- `scripts/prepare_sqlite_deployment.py` (consistent DB backup and read-only Production package).
+- `docs/SQLITE-IN-VSCODE.md`.
+- Generated local `WorkshopRsvp/WorkshopRsvp.db` (ignored; recreated by migrations and startup seed).
 
 Modified:
 
-- `WorkshopRsvp/WorkshopRsvp.csproj`: required packages and patched transitive dependencies.
-- `WorkshopRsvp/Models/Rsvp.cs`: primary key only.
-- `WorkshopRsvp/Controllers/WorkshopsController.cs`: constructor injection and async reads; removed in-memory registration storage.
-- `WorkshopRsvp/Program.cs`: database registration, local migrations, startup seed, production connection guard.
-- `WorkshopRsvp/appsettings.json`: local connection string and production migration opt-in default.
-- `WorkshopRsvp/Views/Workshops/Confirm.cshtml`: explains that this lab's form preview does not save registrations.
-- `README.md`: current setup, behavior, verification and submission links.
-- `.gitignore`: local tools, evidence, output, database files, environment files and publish profiles.
+- `WorkshopRsvp/Models/Rsvp.cs`: exact mapped fields, RegistrationDate, form-only Email.
+- `WorkshopRsvp/Program.cs`: stable SQLite path, context provider and seed call.
+- `WorkshopRsvp/appsettings.json`: SQLite connection and startup migrations.
+- `WorkshopRsvp/Controllers/WorkshopsController.cs`: RegistrationDate query/confirmation usage.
+- `WorkshopRsvp/Views/Workshops/Registrations.cshtml`: mapped record columns/date.
+- `WorkshopRsvp/Views/Workshops/Confirm.cshtml`: renamed date property.
+- `WorkshopRsvp/WorkshopRsvp.csproj`: exclude local DB files from ordinary publish.
+- `WorkshopRsvp/Data/Migrations/ApplicationDbContextModelSnapshot.cs`: regenerated for SQLite.
+- `scripts/Deploy-Lab4.sql` and `scripts/Verify-Database.sql`: SQLite syntax.
+- `.gitignore`, README, this report and Azure/submission guide.
 
-Local publish output is in ignored `artifacts/publish`. Existing publish profiles were preserved and excluded from submission.
+The old SQL Server migration files were replaced because migrations are provider-specific. The earlier implementation is preserved in Git commit `79dfd5c`; its SQL Server database was left untouched. ApplicationDbContext itself and the existing HTTP test script needed no change. Local artifacts contain published output and the read-only package; none of the reference files or generated databases are staged for Git.
 
-## Actual verification results
+## Remaining work and limitations
 
-| Check executed | Result |
-| --- | --- |
-| dotnet restore WorkshopRsvp.sln | Passed. |
-| dotnet build WorkshopRsvp.sln --no-restore | Passed: 0 warnings, 0 errors on final build. |
-| dotnet build WorkshopRsvp.sln -c Release --no-restore | Passed: 0 warnings, 0 errors. |
-| dotnet publish ... -c Release --no-restore -o artifacts/publish | Passed; generated IIS web.config inspected. |
-| dotnet list WorkshopRsvp package --vulnerable --include-transitive | No vulnerable packages reported by the configured sources. |
-| dotnet ef migrations add InitialCreate | Passed; migration and snapshot generated by CLI. |
-| dotnet ef database update | Passed; database, table and migration history created. |
-| dotnet ef migrations list | InitialCreate listed as applied (not pending). |
-| dotnet ef migrations has-pending-model-changes | No changes since last migration. |
-| Generated idempotent script executed against initialized LocalDB | Passed without changing existing rows. |
-| Development HTTP regression checks | All 19 passed, then all 19 passed again after restart. |
-| Published Release in Production mode against local SQL named pipe | Executed locally with a connection override; all 19 HTTP checks passed. This verifies the publish output, not Azure networking or hosting. |
-| Direct SQL query after form tests and restart | Exactly 3 rows, Ids 1/2/3, expected data and migration history. |
-| Native browser visual review | Unverified: browser host unavailable; Chrome app approval timed out. |
-| Azure URL and Azure SQL verification | Not run: deployment not authorized/performed. |
+No unresolved compilation, migration, dependency-audit, database-integrity or tested HTTP errors remain. Local HTTP-only testing logs the expected HTTPS-port warning; real Azure HTTPS still requires verification. The seed initializer is intended for a single-instance lab startup; concurrent initialization was not tested.
 
-The 19 HTTP checks cover Home, Privacy, Workshops, RSVP Form, Registrations, CSS, Bootstrap, validation JavaScript, each seeded name, three rows, Yes/No accommodation, database count, antiforgery field, server-side invalid-form validation, successful confirmation, no insertion from the form, and HTTP 400 for missing antiforgery token.
-
-Database evidence:
-
-| Id | FullName | Email | WorkshopTitle | NeedsAccommodation | RegisteredOn |
-| --- | --- | --- | --- | --- | --- |
-| 1 | Alice Martin | alice@example.com | Routing Basics | 0 | 2026-10-01 09:30:00 |
-| 2 | Bilal Khan | bilal@example.com | EF Core Intro | 1 | 2026-10-02 14:15:00 |
-| 3 | Chloe Tremblay | chloe@example.com | Razor Essentials | 0 | 2026-10-03 11:00:00 |
-
-Migration: `20261108004420_InitialCreate`, product version `8.0.22`. Its timestamp was generated by the CLI in UTC.
-
-## Resolved issues and remaining limits
-
-Initial sandbox restrictions prevented network restore, Git metadata writes and LocalDB access; approved command escalation allowed those operations. Required older scaffolding dependencies initially triggered NuGet advisories. Direct compatible patches (Microsoft.Build 17.8.43, NuGet.Packaging/Protocol 6.11.2, SQLitePCLRaw.bundle_e_sqlite3 2.1.14) removed all reported advisories while keeping the required EF and scaffolding versions. An intermediate build encountered an executable lock from the test app; stopping that process and rebuilding resolved it. PowerShell's script execution policy was left unchanged; checks ran as a reviewed in-memory script block.
-
-No unresolved compilation, migration, package-audit, or tested HTTP errors remain. HTTP-only local testing logged the expected inability to determine an HTTPS redirect port; Azure HTTPS still needs verification after deployment. Seeding is designed for a single-instance lab startup; concurrent multi-instance initialization was not tested. A real browser visual check, cloud deployment, Azure verification, screenshots, and GitHub push remain outstanding.
-
-Follow [Azure and submission instructions](AZURE-AND-SUBMISSION.md) for the exact settings, verification command, two screenshots, two submission links and approval-dependent steps.
+A VS Code database editor tab was opened and the extension installed, but the final visual grid remains unverified. Follow [SQLite viewing instructions](SQLITE-IN-VSCODE.md). Actual Azure deployment/verification, Azure screenshot, acceptable database screenshot, GitHub push and Brightspace submission remain pending. See [Azure and submission instructions](AZURE-AND-SUBMISSION.md). No credentials or Azure resources were changed.

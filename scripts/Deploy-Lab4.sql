@@ -1,42 +1,20 @@
-IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
-BEGIN
-    CREATE TABLE [__EFMigrationsHistory] (
-        [MigrationId] nvarchar(150) NOT NULL,
-        [ProductVersion] nvarchar(32) NOT NULL,
-        CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
-    );
-END;
-GO
+-- Fresh SQLite databases only. For repeatable updates, use dotnet ef database update.
+CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
+    "MigrationId" TEXT NOT NULL CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY,
+    "ProductVersion" TEXT NOT NULL
+);
 
 BEGIN TRANSACTION;
-GO
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20261108004420_InitialCreate'
-)
-BEGIN
-    CREATE TABLE [Rsvps] (
-        [Id] int NOT NULL IDENTITY,
-        [FullName] nvarchar(80) NOT NULL,
-        [Email] nvarchar(max) NOT NULL,
-        [WorkshopTitle] nvarchar(max) NOT NULL,
-        [NeedsAccommodation] bit NOT NULL,
-        [RegisteredOn] datetime2 NOT NULL,
-        CONSTRAINT [PK_Rsvps] PRIMARY KEY ([Id])
-    );
-END;
-GO
+CREATE TABLE "Rsvps" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Rsvps" PRIMARY KEY AUTOINCREMENT,
+    "FullName" TEXT NOT NULL,
+    "NeedsAccommodation" INTEGER NOT NULL,
+    "WorkshopTitle" TEXT NOT NULL,
+    "RegistrationDate" TEXT NOT NULL
+);
 
-IF NOT EXISTS (
-    SELECT * FROM [__EFMigrationsHistory]
-    WHERE [MigrationId] = N'20261108004420_InitialCreate'
-)
-BEGIN
-    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-    VALUES (N'20261108004420_InitialCreate', N'8.0.22');
-END;
-GO
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20261108165306_InitialSqlite', '8.0.22');
 
 COMMIT;
-GO

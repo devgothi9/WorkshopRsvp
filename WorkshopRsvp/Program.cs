@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 using WorkshopRsvp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,20 +9,22 @@ builder.Services.AddControllersWithViews();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Configure ConnectionStrings:DefaultConnection.");
 
-if (!builder.Environment.IsDevelopment() &&
-    connectionString.Contains("(localdb)", StringComparison.OrdinalIgnoreCase))
+// Resolve relative filenames against the project, independent of the shell's cwd.
+var sqliteConnection = new SqliteConnectionStringBuilder(connectionString);
+if (!Path.IsPathRooted(sqliteConnection.DataSource))
 {
-    throw new InvalidOperationException(
-        "LocalDB is for local development. Configure DefaultConnection with the Azure SQL connection string before deployment.");
+    sqliteConnection.DataSource = Path.GetFullPath(
+        Path.Combine(builder.Environment.ContentRootPath, sqliteConnection.DataSource));
 }
+Directory.CreateDirectory(Path.GetDirectoryName(sqliteConnection.DataSource)!);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString, sql => sql.EnableRetryOnFailure()));
+    options.UseSqlite(sqliteConnection.ConnectionString));
 
 var app = builder.Build();
 
-// Apply migrations automatically locally. Production can use a reviewed SQL script
-// or explicitly opt in for a single-instance lab deployment.
+// Create/update the SQLite schema before seeding. Disable startup migrations only
+// when a deployment process has already applied them to the configured database.
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -31,7 +34,7 @@ using (var scope = app.Services.CreateScope())
         await context.Database.MigrateAsync();
     }
 
-    await DbInitializer.InitializeAsync(context);
+    await SeedData.InitializeAsync(context);
 }
 
 // Configure the HTTP request pipeline.

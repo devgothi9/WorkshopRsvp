@@ -49,7 +49,7 @@ namespace WorkshopRsvp.Controllers
                 return View("RsvpForm", model);
             }
 
-            model.RegisteredOn = DateTime.Now;
+            model.RegistrationDate = DateTime.Now;
             // Lab 4 keeps form confirmation read-only; the list shows seeded data.
 
             ViewData["Message"] = $"Thanks for registering, {model.FullName}!";
@@ -61,7 +61,7 @@ namespace WorkshopRsvp.Controllers
         {
             var registrations = await _context.Rsvps
                 .AsNoTracking()
-                .OrderBy(r => r.RegisteredOn)
+                .OrderBy(r => r.RegistrationDate)
                 .ThenBy(r => r.Id)
                 .ToListAsync();
             return View(registrations);
